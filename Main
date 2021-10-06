@@ -1,0 +1,41 @@
+#include <avr/sleep.h>
+#define INTERRUPT_PIN 2
+#define LASER_OUTPUT_PIN 3
+#define LED_BUILTIN_PIN LED_BUILTIN
+volatile bool flag = false;
+
+void setup() {
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  //Serial.begin(9600);
+  
+  pinMode(LASER_OUTPUT_PIN, OUTPUT);
+  pinMode(LED_BUILTIN_PIN, OUTPUT);
+  pinMode(INTERRUPT_PIN, INPUT);
+  
+  digitalWrite(LED_BUILTIN_PIN, HIGH);
+
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), wakeUp, RISING); //COULD BE FALLING DEPENDING ON WIRING 
+}
+
+void loop() {
+  
+  if (!flag){
+    return;
+  }
+
+  //Serial.println("Interrupt Fired");
+  
+  digitalWrite(3,HIGH);
+  delay(400);
+  digitalWrite(3,LOW);  
+  delay(100);      //this might be too long
+  flag = false;
+
+  //Serial.println("Going to Sleep");
+  //delay(1000);
+  sleep_enable();
+  sleep_cpu();
+  //processor shuts off for indeterminant amount of time until interrupt 
+  sleep_disable();
+  
+}
